@@ -103,7 +103,7 @@ export const createGlobalFunctionsInWebviewContext = () => {
             },
           },
         ],
-        model: "text-davinci-002-render",
+        model: "text-davinci-002-render-sha-mobile",
         parent_message_id: messageId,
       };
 
@@ -230,7 +230,7 @@ export async function postMessage({
         },
       },
     ],
-    model: 'text-davinci-002-render',
+    model: 'text-davinci-002-render-sha-mobile',
     parent_message_id: messageId,
   };
 
