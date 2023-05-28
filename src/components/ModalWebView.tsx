@@ -20,7 +20,7 @@ import {
   retryLogin,
 } from '../api';
 import { WebView as RNWebView } from 'react-native-webview';
-import { CHAT_PAGE, LOGIN_PAGE, USER_AGENT } from '../constants';
+import { CHAT_PAGE, LOGIN_PAGE, USER_AGENT, LOGIN_SUCCESS_PAGE } from '../constants';
 import { ChatGptError, ChatGptResponse, WebViewEvents } from '../types';
 import useWebViewAnimation from '../hooks/useWebViewAnimation';
 import parseStreamedGptResponse from '../utils/parseStreamedGptResponse';
@@ -144,7 +144,7 @@ const ModalWebView = forwardRef<ModalWebViewMethods, Props>(
             source={{ uri: LOGIN_PAGE }}
             onNavigationStateChange={(event) => {
               if (
-                event.url.startsWith(CHAT_PAGE) &&
+                event.url.startsWith(LOGIN_SUCCESS_PAGE) &&
                 event.loading &&
                 status === 'visible'
               ) {
