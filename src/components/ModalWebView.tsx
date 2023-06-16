@@ -6,6 +6,7 @@ import {
   useEffect,
   useImperativeHandle,
   useState,
+  useRef,
 } from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useBackHandler, useAppState } from '@react-native-community/hooks';
@@ -25,6 +26,7 @@ import { ChatGptError, ChatGptResponse, WebViewEvents } from '../types';
 import useWebViewAnimation from '../hooks/useWebViewAnimation';
 import parseStreamedGptResponse from '../utils/parseStreamedGptResponse';
 import { getStatusText } from '../utils/httpCodes';
+import { useStoreState, useStoreActions } from 'easy-peasy';
 
 interface PassedProps {
   accessToken: string;
@@ -60,6 +62,15 @@ const ModalWebView = forwardRef<ModalWebViewMethods, Props>(
     },
     ref
   ) => {
+    const selectedGPTModel = useStoreState(state => state.ai.selectedGPTModel);
+    const [jsKey, setJsKey] = useState(0);
+    const injectedJavaScript = useRef(createGlobalFunctionsInWebviewContext(selectedGPTModel));
+
+    useEffect(() => {
+      injectedJavaScript.current = createGlobalFunctionsInWebviewContext(selectedGPTModel);
+      setJsKey(prevKey => prevKey + 1); // This will force a re-render of RNWebView
+    }, [selectedGPTModel]);
+
     const appState = useAppState();
     const [status, setStatus] = useState<'hidden' | 'animating' | 'visible'>(
       'hidden'
@@ -128,7 +139,8 @@ const ModalWebView = forwardRef<ModalWebViewMethods, Props>(
           ]}
         >
           <RNWebView
-            injectedJavaScript={createGlobalFunctionsInWebviewContext()}
+            key={jsKey}
+            injectedJavaScript={injectedJavaScript.current}
             ref={onWebviewRefChange}
             onLoad={async (event) => {
               const { url, loading } = event.nativeEvent;

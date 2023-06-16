@@ -14,6 +14,7 @@ import type { RefObject } from 'react';
 import type WebView from 'react-native-webview';
 import wait from '../utils/wait';
 import { getStatusText } from '../utils/httpCodes';
+import { gptModelsMap } from '../../../../src/config';
 
 let webview: RefObject<WebView>['current'];
 
@@ -31,7 +32,8 @@ export const init = (webviewRef: RefObject<WebView>['current']) => {
  * use fn.toString() or`${fn}` and wrap it in a IIFE,
  * but babel messes up the transformations of async/await and breaks the injected code.
  */
-export const createGlobalFunctionsInWebviewContext = () => {
+export const createGlobalFunctionsInWebviewContext = (selectedGPTModel: string) => {
+  
   return `
     const { fetch: originalFetch } = window;
     window.fetch = async (...args) => {
@@ -103,7 +105,7 @@ export const createGlobalFunctionsInWebviewContext = () => {
             },
           },
         ],
-        model: "text-davinci-002-render-sha-mobile",
+        model: "${gptModelsMap[selectedGPTModel].name}",
         parent_message_id: messageId,
       };
 
